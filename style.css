@@ -1,0 +1,182 @@
+/* Estilos corporativos ALMAGAN INGENIEROS */
+
+/* Variables de colores */
+:root {
+    --almagan-gold: #C9A227;
+    --almagan-gold-light: #D4AF37;
+    --almagan-gold-dark: #B8941F;
+    --almagan-black: #1A1A1A;
+    --almagan-dark-gray: #4A4A4A;
+    --almagan-gray: #6B6B6B;
+    --almagan-light-gray: #F5F5F5;
+    --almagan-yellow: #F4D03F;
+    --almagan-white: #FFFFFF;
+}
+
+/* Estilos generales */
+.stApp {
+    background: linear-gradient(135deg, #F5F5F5 0%, #FFFFFF 100%);
+}
+
+/* Headers y títulos */
+h1, h2, h3 {
+    color: var(--almagan-black) !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1 {
+    border-bottom: 3px solid var(--almagan-gold);
+    padding-bottom: 10px;
+}
+
+/* Botones primarios - estilo dorado */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, var(--almagan-gold) 0%, var(--almagan-gold-dark) 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 6px rgba(201, 162, 39, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, var(--almagan-gold-light) 0%, var(--almagan-gold) 100%) !important;
+    box-shadow: 0 6px 12px rgba(201, 162, 39, 0.4) !important;
+    transform: translateY(-2px);
+}
+
+/* Botones secundarios */
+.stButton > button:not([kind="primary"]) {
+    background: var(--almagan-light-gray) !important;
+    color: var(--almagan-dark-gray) !important;
+    border: 2px solid var(--almagan-gray) !important;
+    border-radius: 8px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.stButton > button:not([kind="primary"]):hover {
+    background: var(--almagan-gold) !important;
+    color: white !important;
+    border-color: var(--almagan-gold) !important;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, var(--almagan-black) 0%, var(--almagan-dark-gray) 100%) !important;
+}
+
+[data-testid="stSidebar"] .stMarkdown {
+    color: white !important;
+}
+
+/* Links de navegación */
+[data-testid="stSidebar"] a {
+    color: white !important;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 5px 0;
+}
+
+[data-testid="stSidebar"] a:hover {
+    background: var(--almagan-gold) !important;
+    color: white !important;
+}
+
+/* Inputs y formularios */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stSelectbox > div > div > div {
+    border: 2px solid #E0E0E0 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: var(--almagan-gold) !important;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2) !important;
+}
+
+/* Tarjetas y contenedores */
+.css-1r6slb0, .css-1y4p8pa {
+    background: white !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #E8E8E8 !important;
+}
+
+/* Métricas y KPIs */
+[data-testid="stMetricValue"] {
+    color: var(--almagan-gold) !important;
+    font-weight: 700 !important;
+}
+
+[data-testid="stMetricLabel"] {
+    color: var(--almagan-dark-gray) !important;
+    font-weight: 600 !important;
+}
+
+/* Tablas */
+.stDataFrame {
+    border: 1px solid #E0E0E0 !important;
+    border-radius: 8px !important;
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F1F1F1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--almagan-gold);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--almagan-gold-dark);
+}
+
+/* Dividers */
+hr {
+    border-color: var(--almagan-gold) !important;
+    border-width: 2px !important;
+}
+
+/* Alertas y mensajes */
+.stAlert {
+    border-radius: 8px !important;
+    border-left: 4px solid var(--almagan-gold) !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background: var(--almagan-light-gray) !important;
+    border-radius: 8px !important;
+    color: var(--almagan-black) !important;
+    font-weight: 600 !important;
+}
+
+/* Checkbox y radio */
+.stCheckbox > label > span,
+.stRadio > label > span {
+    color: var(--almagan-dark-gray) !important;
+}
+
+/* Fecha picker */
+.stDateInput > div > div > input {
+    border: 2px solid #E0E0E0 !important;
+    border-radius: 8px !important;
+}
