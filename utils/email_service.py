@@ -38,6 +38,21 @@ def get_email_sender_config() -> dict:
             }
     except Exception:
         pass
+    try:
+        import os
+        email = os.environ.get("EMAIL_SENDER", "")
+        password = os.environ.get("EMAIL_PASSWORD", "")
+        if email and password:
+            smtp = get_smtp_for_email(email)
+            return {
+                "smtp_server": os.environ.get("EMAIL_SMTP_SERVER", smtp["smtp_server"]),
+                "smtp_port": int(os.environ.get("EMAIL_SMTP_PORT", smtp["smtp_port"])),
+                "sender_email": email,
+                "sender_password": password,
+                "sender_name": os.environ.get("EMAIL_SENDER_NAME", "ALMAGAN INGENIEROS"),
+            }
+    except Exception:
+        pass
     return {}
 
 
