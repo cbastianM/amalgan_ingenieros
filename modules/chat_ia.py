@@ -152,6 +152,9 @@ def _build_contexto(supabase, proyecto) -> str:
 def _call_deepseek(messages: list) -> str:
     api_key = st.secrets.get("deepseek", {}).get("API_KEY", "")
     if not api_key:
+        import os
+        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+    if not api_key:
         return "⚠️ API Key de DeepSeek no configurada. Agregala en `.streamlit/secrets.toml` como `[deepseek] API_KEY = \"tu-key\"`"
 
     headers = {

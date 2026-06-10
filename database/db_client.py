@@ -155,7 +155,11 @@ def _get_connection(database_url: str):
 class PgClient:
     def __init__(self, connection_string: Optional[str] = None):
         if connection_string is None:
-            connection_string = st.secrets["database"]["DATABASE_URL"]
+            try:
+                connection_string = st.secrets["database"]["DATABASE_URL"]
+            except Exception:
+                import os
+                connection_string = os.environ["DATABASE_URL"]
         self._connection_string = connection_string
 
     def table(self, name: str) -> QueryBuilder:
