@@ -159,7 +159,12 @@ class PgClient:
                 connection_string = st.secrets["database"]["DATABASE_URL"]
             except Exception:
                 import os
-                connection_string = os.environ["DATABASE_URL"]
+                connection_string = os.environ.get("DATABASE_URL", "")
+                if not connection_string:
+                    raise RuntimeError(
+                        "DATABASE_URL no encontrada. En Render: Settings -> Environment -> agregar DATABASE_URL. "
+                        "En local: .streamlit/secrets.toml con [database] DATABASE_URL = \"...\""
+                    )
         self._connection_string = connection_string
 
     def table(self, name: str) -> QueryBuilder:
