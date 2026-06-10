@@ -159,7 +159,9 @@ def _call_deepseek(messages: list) -> str:
         import os
         api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     if not api_key:
-        return "⚠️ API Key de DeepSeek no configurada. Agregala en `.streamlit/secrets.toml` como `[deepseek] API_KEY = \"tu-key\"`"
+        return "⚠️ DEEPSEEK_API_KEY no encontrada. Agregala como variable de entorno en Render (Settings > Environment)."
+    if not api_key.startswith("sk-"):
+        return f"⚠️ DEEPSEEK_API_KEY no parece valida (debe empezar con sk-...). Valor actual: {api_key[:8]}..."
 
     headers = {
         "Authorization": f"Bearer {api_key}",
