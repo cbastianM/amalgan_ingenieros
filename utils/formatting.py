@@ -1,3 +1,18 @@
+from decimal import Decimal
+
+def df_to_float(df, columns=None):
+    if df.empty:
+        return df
+    cols = columns if columns else df.columns
+    for col in cols:
+        if col in df.columns:
+            try:
+                df[col] = df[col].apply(lambda x: float(x) if isinstance(x, Decimal) else x)
+            except Exception:
+                pass
+    return df
+
+
 def parsear_moneda(v) -> float:
     """Convierte string de moneda colombiana a float."""
     if v is None:

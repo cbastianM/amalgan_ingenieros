@@ -2,6 +2,8 @@
 import streamlit as st
 from utils.branding import render_logo_sidebar
 from utils.profile import render_profile_photo_block
+from database.queries import get_config
+from database.supabase_client import get_supabase
 
 def render_sidebar():
     if "usuario_actual" not in st.session_state or st.session_state.usuario_actual is None:
@@ -27,8 +29,25 @@ def render_sidebar():
     st.sidebar.caption(st.session_state.rol_actual)
     
     # Info del proyecto
-    if st.session_state.nombre_proyecto:
-        st.sidebar.info(f"Proyecto: {st.session_state.nombre_proyecto[:40]}")
+    proyectos = st.session_state.get("proyectos_disponibles", [])
+    nombre_actual = st.session_state.get("nombre_proyecto", "")
+    if proyectos:
+        idx_actual = proyectos.index(nombre_actual) if nombre_actual in proyectos else 0
+        proyecto_sel = st.sidebar.selectbox(
+            "Proyecto",
+            proyectos,
+            index=idx_actual,
+            key="sidebar_proyecto_sel"
+        )
+        if proyecto_sel != nombre_actual:
+            st.session_state.nombre_proyecto = proyecto_sel
+            supabase = get_supabase()
+            config = get_config(supabase, proyecto_sel)
+            st.session_state.datos_proyecto = config or {}
+            st.cache_data.clear()
+            st.rerun()
+    elif nombre_actual:
+        st.sidebar.info(f"Proyecto: {nombre_actual[:40]}")
     
     # Navegacion
     st.sidebar.markdown("---")
@@ -36,6 +55,7 @@ def render_sidebar():
     
     if es_director():
         st.sidebar.page_link("pages/00_chat.py", label="Chat de Obra", icon="💬")
+        st.sidebar.page_link("pages/10_Chat_IA.py", label="Asistente IA", icon="🤖")
         st.sidebar.page_link("pages/01_Panel_Director.py", label="Panel Director", icon="📊")
         st.sidebar.page_link("pages/02_Mis_Tareas.py", label="Mis Tareas", icon="📋")
         st.sidebar.page_link("pages/03_Proveedores.py", label="Proveedores", icon="🏢")
@@ -65,7 +85,7 @@ def render_sidebar():
     col1, col2 = st.sidebar.columns(2)
     with col1:
         if st.button("Salir", use_container_width=True, key="btn_logout"):
-            for k in ["usuario_actual", "rol_actual", "nombre_visible", "datos_proyecto", "nombre_proyecto", "ultima_carga"]:
+            for k in ["usuario_actual", "rol_actual", "nombre_visible", "datos_proyecto", "nombre_proyecto", "ultima_carga", "proyectos_disponibles"]:
                 st.session_state.pop(k, None)
             st.rerun()
     with col2:

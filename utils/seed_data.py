@@ -101,30 +101,30 @@ def seed_tareas_data(supabase, proyecto, director="director1", residente="reside
 def seed_actividades_data(supabase):
     inserted = 0
     actividades = [
-        {"id": "1.1.01", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Excavación para cimentación", "unidad": "m3", "cantidad_total": 450, "valor_unitario": 28500, "valor_total": 12825000},
-        {"id": "1.1.02", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Relleno y compactación", "unidad": "m3", "cantidad_total": 280, "valor_unitario": 18500, "valor_total": 5180000},
-        {"id": "1.1.03", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Concreto de cimentación f'c=3000 psi", "unidad": "m3", "cantidad_total": 180, "valor_unitario": 485000, "valor_total": 87300000},
-        {"id": "1.1.04", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Acero de refuerzo cimentación", "unidad": "kg", "cantidad_total": 12500, "valor_unitario": 4200, "valor_total": 52500000},
-        {"id": "1.2.01", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Concreto columnas f'c=4000 psi", "unidad": "m3", "cantidad_total": 320, "valor_unitario": 520000, "valor_total": 166400000},
-        {"id": "1.2.02", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Acero de refuerzo columnas", "unidad": "kg", "cantidad_total": 28000, "valor_unitario": 4300, "valor_total": 120400000},
-        {"id": "1.2.03", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Concreto vigas y losas f'c=3000 psi", "unidad": "m3", "cantidad_total": 540, "valor_unitario": 495000, "valor_total": 267300000},
-        {"id": "1.2.04", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Encofrado columnas y vigas", "unidad": "m2", "cantidad_total": 3800, "valor_unitario": 35000, "valor_total": 133000000},
-        {"id": "2.1.01", "componente": "MAMPOSTERIA", "capitulo": "DIVISIONES", "descripcion": "Muro en bloque cerámico e=10cm", "unidad": "m2", "cantidad_total": 2500, "valor_unitario": 58000, "valor_total": 145000000},
-        {"id": "2.1.02", "componente": "MAMPOSTERIA", "capitulo": "DIVISIONES", "descripcion": "Muro en bloque cerámico e=15cm", "unidad": "m2", "cantidad_total": 1800, "valor_unitario": 72000, "valor_total": 129600000},
-        {"id": "2.2.01", "componente": "MAMPOSTERIA", "capitulo": "REVESTIMIENTOS", "descripcion": "Estuco interior muros", "unidad": "m2", "cantidad_total": 3200, "valor_unitario": 18500, "valor_total": 59200000},
-        {"id": "2.2.02", "componente": "MAMPOSTERIA", "capitulo": "REVESTIMIENTOS", "descripcion": "Estuco exterior fachada", "unidad": "m2", "cantidad_total": 1600, "valor_unitario": 22000, "valor_total": 35200000},
-        {"id": "3.1.01", "componente": "INSTALACIONES", "capitulo": "ELECTRICA", "descripcion": "Instalación red eléctrica provisional", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 12500000, "valor_total": 12500000},
-        {"id": "3.1.02", "componente": "INSTALACIONES", "capitulo": "ELECTRICA", "descripcion": "Instalación red eléctrica definitiva", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 89000000, "valor_total": 89000000},
-        {"id": "3.2.01", "componente": "INSTALACIONES", "capitulo": "HIDRAULICA", "descripcion": "Instalación red hidráulica", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 65000000, "valor_total": 65000000},
-        {"id": "3.2.02", "componente": "INSTALACIONES", "capitulo": "HIDRAULICA", "descripcion": "Instalación red sanitaria", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 58000000, "valor_total": 58000000},
-        {"id": "4.1.01", "componente": "ACABADOS", "capitulo": "PISOS", "descripcion": "Piso cerámico interior 60x60", "unidad": "m2", "cantidad_total": 3500, "valor_unitario": 68000, "valor_total": 238000000},
-        {"id": "4.1.02", "componente": "ACABADOS", "capitulo": "PISOS", "descripcion": "Piso porcelanato zonas comunes", "unidad": "m2", "cantidad_total": 800, "valor_unitario": 95000, "valor_total": 76000000},
-        {"id": "4.2.01", "componente": "ACABADOS", "capitulo": "PINTURA", "descripcion": "Pintura interior vinilo 2 manos", "unidad": "m2", "cantidad_total": 4800, "valor_unitario": 12000, "valor_total": 57600000},
-        {"id": "4.2.02", "componente": "ACABADOS", "capitulo": "PINTURA", "descripcion": "Pintura exterior impermeabilizante", "unidad": "m2", "cantidad_total": 1800, "valor_unitario": 18000, "valor_total": 32400000},
+        {"codigo": "1.1.01", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Excavacion para cimentacion", "unidad": "m3", "cantidad_total": 450, "valor_unitario": 28500, "valor_total": 12825000},
+        {"codigo": "1.1.02", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Relleno y compactacion", "unidad": "m3", "cantidad_total": 280, "valor_unitario": 18500, "valor_total": 5180000},
+        {"codigo": "1.1.03", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Concreto de cimentacion fc=3000 psi", "unidad": "m3", "cantidad_total": 180, "valor_unitario": 485000, "valor_total": 87300000},
+        {"codigo": "1.1.04", "componente": "OBRA CIVIL", "capitulo": "CIMENTACION", "descripcion": "Acero de refuerzo cimentacion", "unidad": "kg", "cantidad_total": 12500, "valor_unitario": 4200, "valor_total": 52500000},
+        {"codigo": "1.2.01", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Concreto columnas fc=4000 psi", "unidad": "m3", "cantidad_total": 320, "valor_unitario": 520000, "valor_total": 166400000},
+        {"codigo": "1.2.02", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Acero de refuerzo columnas", "unidad": "kg", "cantidad_total": 28000, "valor_unitario": 4300, "valor_total": 120400000},
+        {"codigo": "1.2.03", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Concreto vigas y losas fc=3000 psi", "unidad": "m3", "cantidad_total": 540, "valor_unitario": 495000, "valor_total": 267300000},
+        {"codigo": "1.2.04", "componente": "OBRA CIVIL", "capitulo": "ESTRUCTURA", "descripcion": "Encofrado columnas y vigas", "unidad": "m2", "cantidad_total": 3800, "valor_unitario": 35000, "valor_total": 133000000},
+        {"codigo": "2.1.01", "componente": "MAMPOSTERIA", "capitulo": "DIVISIONES", "descripcion": "Muro en bloque ceramico e=10cm", "unidad": "m2", "cantidad_total": 2500, "valor_unitario": 58000, "valor_total": 145000000},
+        {"codigo": "2.1.02", "componente": "MAMPOSTERIA", "capitulo": "DIVISIONES", "descripcion": "Muro en bloque ceramico e=15cm", "unidad": "m2", "cantidad_total": 1800, "valor_unitario": 72000, "valor_total": 129600000},
+        {"codigo": "2.2.01", "componente": "MAMPOSTERIA", "capitulo": "REVESTIMIENTOS", "descripcion": "Estuco interior muros", "unidad": "m2", "cantidad_total": 3200, "valor_unitario": 18500, "valor_total": 59200000},
+        {"codigo": "2.2.02", "componente": "MAMPOSTERIA", "capitulo": "REVESTIMIENTOS", "descripcion": "Estuco exterior fachada", "unidad": "m2", "cantidad_total": 1600, "valor_unitario": 22000, "valor_total": 35200000},
+        {"codigo": "3.1.01", "componente": "INSTALACIONES", "capitulo": "ELECTRICA", "descripcion": "Instalacion red electrica provisional", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 12500000, "valor_total": 12500000},
+        {"codigo": "3.1.02", "componente": "INSTALACIONES", "capitulo": "ELECTRICA", "descripcion": "Instalacion red electrica definitiva", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 89000000, "valor_total": 89000000},
+        {"codigo": "3.2.01", "componente": "INSTALACIONES", "capitulo": "HIDRAULICA", "descripcion": "Instalacion red hidraulica", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 65000000, "valor_total": 65000000},
+        {"codigo": "3.2.02", "componente": "INSTALACIONES", "capitulo": "HIDRAULICA", "descripcion": "Instalacion red sanitaria", "unidad": "gl", "cantidad_total": 1, "valor_unitario": 58000000, "valor_total": 58000000},
+        {"codigo": "4.1.01", "componente": "ACABADOS", "capitulo": "PISOS", "descripcion": "Piso ceramico interior 60x60", "unidad": "m2", "cantidad_total": 3500, "valor_unitario": 68000, "valor_total": 238000000},
+        {"codigo": "4.1.02", "componente": "ACABADOS", "capitulo": "PISOS", "descripcion": "Piso porcelanato zonas comunes", "unidad": "m2", "cantidad_total": 800, "valor_unitario": 95000, "valor_total": 76000000},
+        {"codigo": "4.2.01", "componente": "ACABADOS", "capitulo": "PINTURA", "descripcion": "Pintura interior vinilo 2 manos", "unidad": "m2", "cantidad_total": 4800, "valor_unitario": 12000, "valor_total": 57600000},
+        {"codigo": "4.2.02", "componente": "ACABADOS", "capitulo": "PINTURA", "descripcion": "Pintura exterior impermeabilizante", "unidad": "m2", "cantidad_total": 1800, "valor_unitario": 18000, "valor_total": 32400000},
     ]
     for a in actividades:
         try:
-            existing = supabase.table("actividades").select("id").eq("id", a["id"]).execute()
+            existing = supabase.table("actividades").select("codigo").eq("codigo", a["codigo"]).execute()
             if not existing.data:
                 supabase.table("actividades").insert(a).execute()
                 inserted += 1

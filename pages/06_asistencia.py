@@ -1,8 +1,8 @@
-import streamlit as st
+﻿import streamlit as st
 from database.supabase_client import get_supabase
 from utils.sidebar import render_sidebar
 
-st.set_page_config(page_title="ALMAGAN | Asistencia", page_icon="👷", layout="wide")
+st.set_page_config(page_title="ALMAGAN | Asistencia", page_icon="👷", layout="wide", initial_sidebar_state="collapsed")
 
 render_sidebar()
 

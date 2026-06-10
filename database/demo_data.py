@@ -56,21 +56,37 @@ def _fill_config():
     return [
         {
             "id": "cfg-001",
-            "proyecto": PROYECTO,
+            "proyecto": "Edificio Colombo Americana",
             "total_costo_directo": 1450000000,
             "total_costo_suministros": 320000000,
             "costo_total_obra": 1770000000,
             "costo_total_proyecto": 2100000000,
-        }
+        },
+        {
+            "id": "cfg-002",
+            "proyecto": "Torres del Parque",
+            "total_costo_directo": 2100000000,
+            "total_costo_suministros": 480000000,
+            "costo_total_obra": 2580000000,
+            "costo_total_proyecto": 3000000000,
+        },
+        {
+            "id": "cfg-003",
+            "proyecto": "Centro Comercial Los Alpes",
+            "total_costo_directo": 3200000000,
+            "total_costo_suministros": 650000000,
+            "costo_total_obra": 3850000000,
+            "costo_total_proyecto": 4500000000,
+        },
     ]
 
 
 def _fill_usuarios():
     return [
-        {"id": "u1", "usuario": "director1", "clave": "1234", "rol": "Director", "activo": True, "nombre_visible": "Carlos Mendoza", "foto_perfil": None},
-        {"id": "u2", "usuario": "residente1", "clave": "1234", "rol": "Residente", "activo": True, "nombre_visible": "Ana López", "foto_perfil": None},
-        {"id": "u3", "usuario": "almacenista1", "clave": "1234", "rol": "Almacenista", "activo": True, "nombre_visible": "Pedro Gómez", "foto_perfil": None},
-        {"id": "u4", "usuario": "controlador1", "clave": "1234", "rol": "Controlador", "activo": True, "nombre_visible": "Luis Ramírez", "foto_perfil": None},
+        {"id": "u1", "usuario": "director1", "clave": "1234", "rol": "Director", "activo": True, "nombre_visible": "Carlos Mendoza", "foto_perfil": None, "email": "carlos.mendoza@almagan.com"},
+        {"id": "u2", "usuario": "residente1", "clave": "1234", "rol": "Residente", "activo": True, "nombre_visible": "Ana López", "foto_perfil": None, "email": "ana.lopez@almagan.com"},
+        {"id": "u3", "usuario": "almacenista1", "clave": "1234", "rol": "Almacenista", "activo": True, "nombre_visible": "Pedro Gómez", "foto_perfil": None, "email": "pedro.gomez@almagan.com"},
+        {"id": "u4", "usuario": "controlador1", "clave": "1234", "rol": "Controlador", "activo": True, "nombre_visible": "Luis Ramírez", "foto_perfil": None, "email": "luis.ramirez@almagan.com"},
     ]
 
 
@@ -243,20 +259,20 @@ def _fill_materiales():
 
 def _fill_trabajadores():
     return [
-        {"id": "trab-001", "nombre": "Carlos Ramírez", "cargo": "Maestro de obra", "activo": True},
-        {"id": "trab-002", "nombre": "José Martínez", "cargo": "Albañil", "activo": True},
-        {"id": "trab-003", "nombre": "Miguel Torres", "cargo": "Ayudante general", "activo": True},
-        {"id": "trab-004", "nombre": "Pedro Gómez", "cargo": "Herrero", "activo": True},
-        {"id": "trab-005", "nombre": "Luis Hernández", "cargo": "Electricista", "activo": True},
-        {"id": "trab-006", "nombre": "Andrés López", "cargo": "Plomero", "activo": True},
-        {"id": "trab-007", "nombre": "Roberto Díaz", "cargo": "Carpintero", "activo": True},
-        {"id": "trab-008", "nombre": "Fernando Vargas", "cargo": "Pintor", "activo": True},
-        {"id": "trab-009", "nombre": "Diego Morales", "cargo": "Ayudante general", "activo": True},
-        {"id": "trab-010", "nombre": "Javier Castillo", "cargo": "Operador de maquinaria", "activo": True},
-        {"id": "trab-011", "nombre": "Raúl Peña", "cargo": "Maestro de obra", "activo": True},
-        {"id": "trab-012", "nombre": "Sandra Muñoz", "cargo": "Auxiliar de obra", "activo": True},
-        {"id": "trab-013", "nombre": "Nicolás Ríos", "cargo": "Ayudante", "activo": False},
-        {"id": "trab-014", "nombre": "Carmen Flores", "cargo": "Oficial de obra", "activo": True},
+        {"id": "trab-001", "nombre": "Carlos Ramírez", "cargo": "Maestro de obra", "activo": True, "email": "carlos.ramirez@almagan.com"},
+        {"id": "trab-002", "nombre": "José Martínez", "cargo": "Albañil", "activo": True, "email": "jose.martinez@almagan.com"},
+        {"id": "trab-003", "nombre": "Miguel Torres", "cargo": "Ayudante general", "activo": True, "email": "miguel.torres@almagan.com"},
+        {"id": "trab-004", "nombre": "Pedro Gómez", "cargo": "Herrero", "activo": True, "email": "pedro.gomez@almagan.com"},
+        {"id": "trab-005", "nombre": "Luis Hernández", "cargo": "Electricista", "activo": True, "email": "luis.hernandez@almagan.com"},
+        {"id": "trab-006", "nombre": "Andrés López", "cargo": "Plomero", "activo": True, "email": "andres.lopez@almagan.com"},
+        {"id": "trab-007", "nombre": "Roberto Díaz", "cargo": "Carpintero", "activo": True, "email": "roberto.diaz@almagan.com"},
+        {"id": "trab-008", "nombre": "Fernando Vargas", "cargo": "Pintor", "activo": True, "email": "fernando.vargas@almagan.com"},
+        {"id": "trab-009", "nombre": "Diego Morales", "cargo": "Ayudante general", "activo": True, "email": "diego.morales@almagan.com"},
+        {"id": "trab-010", "nombre": "Javier Castillo", "cargo": "Operador de maquinaria", "activo": True, "email": "javier.castillo@almagan.com"},
+        {"id": "trab-011", "nombre": "Raúl Peña", "cargo": "Maestro de obra", "activo": True, "email": "raul.pena@almagan.com"},
+        {"id": "trab-012", "nombre": "Sandra Muñoz", "cargo": "Auxiliar de obra", "activo": True, "email": "sandra.munoz@almagan.com"},
+        {"id": "trab-013", "nombre": "Nicolás Ríos", "cargo": "Ayudante", "activo": False, "email": "nicolas.rios@almagan.com"},
+        {"id": "trab-014", "nombre": "Carmen Flores", "cargo": "Oficial de obra", "activo": True, "email": "carmen.flores@almagan.com"},
     ]
 
 

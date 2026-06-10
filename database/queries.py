@@ -1,10 +1,9 @@
 # database/queries.py
 import streamlit as st
 import pandas as pd
-from supabase import Client
 from datetime import date, datetime
 from typing import List, Dict, Optional, Any
-from utils.formatting import parsear_moneda
+from utils.formatting import parsear_moneda, df_to_float
 
 # ═══════════════════════════════════════════════════════════
 # READ OPERATIONS
@@ -12,16 +11,28 @@ from utils.formatting import parsear_moneda
 # and changes need to be reflected immediately.
 # ═══════════════════════════════════════════════════════════
 
-def get_config(_supabase, _ttl=300):
-    response = _supabase.table("config").select("*").limit(1).execute()
+def get_config(_supabase, proyecto=None):
+    q = _supabase.table("config").select("*")
+    if proyecto:
+        q = q.eq("proyecto", proyecto)
+    response = q.limit(1).execute()
     if response.data:
         return {k.lower().replace(" ", "_"): v for k, v in response.data[0].items()}
     return {}
+
+
+def get_proyectos(_supabase):
+    response = _supabase.table("config").select("proyecto").execute()
+    if response.data:
+        proyectos = sorted(set(r["proyecto"] for r in response.data if r.get("proyecto")))
+        return proyectos
+    return []
 
 def get_actividades(_supabase):
     response = _supabase.table("actividades").select("*").execute()
     if response.data:
         df = pd.DataFrame(response.data)
+        df = df_to_float(df)
         for col in ["valor_unitario", "cantidad_total", "valor_total"]:
             if col in df.columns:
                 df[col] = df[col].apply(lambda x: parsear_moneda(x) if pd.notna(x) else 0)
@@ -37,33 +48,39 @@ def get_avances(_supabase, proyecto: str, fecha: date = None):
     if fecha:
         query = query.eq("fecha", fecha.isoformat())
     response = query.execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    return df_to_float(df)
 
 def get_materiales(_supabase, proyecto: str):
     response = _supabase.table("materiales").select("*").eq("proyecto", proyecto).execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    return df_to_float(df)
 
 def get_asistencia(_supabase, proyecto: str, fecha: date = None):
     query = _supabase.table("asistencia").select("*").eq("proyecto", proyecto)
     if fecha:
         query = query.eq("fecha", fecha.isoformat())
     response = query.execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    return df_to_float(df)
 
 def get_nomina(_supabase, proyecto: str):
     response = _supabase.table("nomina").select("*").eq("proyecto", proyecto).execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    return df_to_float(df)
 
 def get_tareas(_supabase, proyecto: str = None):
     query = _supabase.table("tareas").select("*")
     if proyecto:
         query = query.eq("proyecto", proyecto)
     response = query.execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    return df_to_float(df)
 
 def get_proveedores(_supabase):
     response = _supabase.table("proveedores").select("*").execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    return df_to_float(df)
 
 # ═══════════════════════════════════════════════════════════
 # WRITE OPERATIONS

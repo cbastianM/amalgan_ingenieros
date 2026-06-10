@@ -3,10 +3,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from supabase import Client
 from database.queries import get_actividades, get_avances, get_tareas, get_nomina, get_materiales, get_asistencia, insert_avance, update_record, delete_record
 from utils.formatting import fmt_cop, fmt_dec
-from utils.seed_data import seed_actividades_data, seed_avances_data, seed_config_data
 import datetime
 
 def calcular_avances(df_act, df_av):
@@ -19,8 +17,8 @@ def calcular_avances(df_act, df_av):
     dr["cantidad_ejecutada"] = 0.0
     if not df_av.empty and "id_item" in df_av.columns:
         ag = df_av.groupby("id_item")["cantidad"].sum().reset_index()
-        ag.columns = ["id", "cantidad_ejecutada"]
-        dr = dr.merge(ag, on="id", how="left")
+        ag.columns = ["codigo", "cantidad_ejecutada"]
+        dr = dr.merge(ag, on="codigo", how="left")
         if "cantidad_ejecutada_y" in dr.columns:
             dr["cantidad_ejecutada"] = dr["cantidad_ejecutada_y"].fillna(0)
             dr.drop(columns=["cantidad_ejecutada_x", "cantidad_ejecutada_y"], inplace=True, errors="ignore")
@@ -43,7 +41,7 @@ def _pie_chart(labels, values, title, colors=None):
     fig = go.Figure(data=[go.Pie(**kwargs)])
     fig.update_layout(
         title=dict(text=title, font=dict(size=20, color='#000000'), x=0.5),
-        margin=dict(t=50, b=20, l=20, r=20), height=420,
+margin=dict(t=50, b=20, l=20, r=20), height=350,
         paper_bgcolor='#f9f9f9', plot_bgcolor='#f9f9f9',
         legend=dict(orientation='h', yanchor='bottom', y=-0.15, xanchor='center', x=0.5, font=dict(size=14, color='#000000'))
     )
@@ -56,7 +54,7 @@ def _donut_progress(pct, label="Avance Global"):
         textinfo='none', hovertemplate='%{label}: %{value:.1f}%<extra></extra>'
     )])
     fig.update_layout(
-        margin=dict(t=40, b=20, l=20, r=20), height=320,
+        margin=dict(t=40, b=20, l=20, r=20), height=280,
         paper_bgcolor='#f9f9f9', plot_bgcolor='#f9f9f9',
         annotations=[dict(text=f'<b>{pct:.1f}%</b>', x=0.5, y=0.5, font_size=38, font_color='#000000', showarrow=False),
                       dict(text=label, x=0.5, y=0.35, font_size=16, font_color='#555555', showarrow=False)]
@@ -68,10 +66,10 @@ def _treemap_avance(df_ca):
         st.info("No hay datos de actividades para mostrar el mapa.")
         return
     df_map = df_ca.copy()
-    df_map["label"] = df_map["id"] + "<br>" + df_map["descripcion"].str[:30]
+    df_map["label"] = df_map["codigo"] + "<br>" + df_map["descripcion"].str[:30]
     df_map["pct_text"] = df_map["pct_avance"].apply(lambda x: f"{x:.0f}%")
     df_map["valor_text"] = df_map["valor_total"].apply(lambda x: fmt_cop(x))
-    df_map["hover"] = ("<b>" + df_map["id"] + "</b> — " + df_map["descripcion"].str[:50] + "<br>" +
+    df_map["hover"] = ("<b>" + df_map["codigo"] + "</b> — " + df_map["descripcion"].str[:50] + "<br>" +
                        "Avance: " + df_map["pct_text"] + "<br>" +
                        "Ejecutado: " + df_map["valor_ejecutado"].apply(fmt_cop) + " / " + df_map["valor_text"])
     if "capitulo" in df_map.columns:
@@ -95,7 +93,7 @@ def _treemap_avance(df_ca):
         marker_line_color="#333333"
     )
     fig.update_layout(
-        margin=dict(t=30, b=10, l=10, r=10), height=650,
+        margin=dict(t=30, b=10, l=10, r=10), height=400,
         paper_bgcolor='#f9f9f9',
         coloraxis_colorbar=dict(
             title=dict(text="% Avance", side="right", font=dict(size=14, color="#000000")),
@@ -110,7 +108,7 @@ def _sunburst_avance(df_ca):
     if df_ca.empty or "componente" not in df_ca.columns:
         return
     df_sun = df_ca.copy()
-    df_sun["label"] = df_sun["id"] + " " + df_sun["descripcion"].str[:25]
+    df_sun["label"] = df_sun["codigo"] + " " + df_sun["descripcion"].str[:25]
     path_cols = ["capitulo", "componente", "label"] if "capitulo" in df_sun.columns else ["componente", "label"]
     fig = px.sunburst(
         df_sun, path=path_cols, values="valor_total",
@@ -124,7 +122,7 @@ def _sunburst_avance(df_ca):
         marker_line_width=2,
         marker_line_color="#333333"
     )
-    fig.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=650,
+    fig.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=400,
         paper_bgcolor='#f9f9f9',
         coloraxis_colorbar=dict(
             title=dict(text="% Avance", side="right", font=dict(size=14, color="#000000")),
@@ -133,7 +131,7 @@ def _sunburst_avance(df_ca):
         ))
     st.plotly_chart(fig, use_container_width=True)
 
-def render_dashboard(supabase: Client):
+def render_dashboard(supabase):
     PA = st.session_state.nombre_proyecto
     config = st.session_state.datos_proyecto
     es_dir = st.session_state.rol_actual == "Director"
@@ -145,15 +143,6 @@ def render_dashboard(supabase: Client):
     </div>
     ''', unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
-    costo_directo = config.get("total_costo_directo", 0) or 0
-    suministros = config.get("total_costo_suministros", 0) or 0
-    costo_obra = config.get("costo_total_obra", 0) or 0
-    costo_total = config.get("costo_total_proyecto", 0) or 0
-    c1.metric("Costo Directo", fmt_cop(costo_directo))
-    c2.metric("Suministros", fmt_cop(suministros))
-    c3.metric("Costo Obra", fmt_cop(costo_obra))
-    c4.metric("Total Proyecto", fmt_cop(costo_total))
     st.divider()
 
     df_act = get_actividades(supabase)
@@ -172,19 +161,90 @@ def render_dashboard(supabase: Client):
     valor_total = df_ca["valor_total"].sum() if not df_ca.empty else 0
     pct_avance = round((df_ca["pct_avance"] * df_ca["valor_total"]).sum() / valor_total, 1) if valor_total > 0 else 0
 
-    k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("Total Actividades", total_act)
-    k2.metric("Con Avance", con_avance)
-    k3.metric("Completadas", completadas)
-    k4.metric("% Avance", f"{pct_avance}%")
-    k5.metric("$ Ejecutado", fmt_cop(valor_ejecutado))
-    st.divider()
-
     # ═══ PESTAÑAS POR SECCION ═══
-    tabs = st.tabs(["Actividades", "Tareas", "Inventario", "Asistencia", "Nomina"])
+    presupuesto_obra = float(config.get("costo_total_obra", 0))
+    presupuesto_directo = float(config.get("total_costo_directo", 0))
+    presupuesto_suministros = float(config.get("total_costo_suministros", 0))
+    presupuesto_total = float(config.get("costo_total_proyecto", presupuesto_obra))
+    df_nom = get_nomina(supabase, PA)
+    total_nomina = float(df_nom["valor"].sum()) if not df_nom.empty and "valor" in df_nom.columns else 0.0
+
+    tabs = st.tabs(["💰 Presupuesto", "Actividades", "Tareas", "Inventario", "Asistencia", "Nomina"])
+
+    # ──── TAB: PRESUPUESTO ────
+    with tabs[0]:
+        st.markdown("### 💰 Presupuesto vs Ejecutado")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.metric("📋 Presupuesto Obra", fmt_cop(presupuesto_obra))
+        with c2:
+            st.metric("🏗️ Ejecutado (Actividades)", fmt_cop(valor_ejecutado),
+                      delta=f"{float(valor_ejecutado) / presupuesto_obra * 100:.1f}%" if presupuesto_obra > 0 else None)
+        c1, c2 = st.columns(2)
+        with c1:
+            st.metric("🔩 Costo Directo", fmt_cop(presupuesto_directo))
+        with c2:
+            st.metric("📦 Suministros", fmt_cop(presupuesto_suministros))
+        c1, c2 = st.columns(2)
+        with c1:
+            st.metric("👷 Nomina Pagada", fmt_cop(total_nomina))
+        with c2:
+            st.metric("📊 Total Proyecto", fmt_cop(presupuesto_total))
+
+        col_bc1, col_bc2 = st.columns(2)
+        with col_bc1:
+            ejecutado_presupuesto = min(valor_ejecutado, presupuesto_obra)
+            pendiente = max(presupuesto_obra - valor_ejecutado, 0)
+            _pie_chart(
+                ["Ejecutado", "Pendiente"],
+                [float(ejecutado_presupuesto), float(pendiente)],
+                "Presupuesto de Obra",
+                colors=["#4CAF50", "#E0E0E0"]
+            )
+        with col_bc2:
+            if not df_ca.empty and "componente" in df_ca.columns:
+                comp_costos = df_ca.groupby("componente").agg(
+                    ejecutado=("valor_ejecutado", "sum"),
+                    presupuesto=("valor_total", "sum")
+                ).reset_index()
+                comp_costos["componente"] = comp_costos["componente"].str[:25]
+                comp_costos = comp_costos.sort_values("presupuesto", ascending=True).tail(6)
+                comp_costos["ejecutado"] = comp_costos["ejecutado"].astype(float)
+                comp_costos["presupuesto"] = comp_costos["presupuesto"].astype(float)
+
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    y=comp_costos["componente"],
+                    x=comp_costos["presupuesto"],
+                    name="Presupuesto",
+                    orientation='h',
+                    marker_color="#E0E0E0",
+                    text=comp_costos["presupuesto"].apply(fmt_cop),
+                    textposition='outside',
+                    textfont=dict(size=11, color="#666")
+                ))
+                fig.add_trace(go.Bar(
+                    y=comp_costos["componente"],
+                    x=comp_costos["ejecutado"],
+                    name="Ejecutado",
+                    orientation='h',
+                    marker_color="#4CAF50",
+                    text=comp_costos["ejecutado"].apply(fmt_cop),
+                    textposition='inside',
+                    textfont=dict(size=11, color="#fff")
+                ))
+                fig.update_layout(
+                    barmode='overlay',
+                    height=300,
+                    margin=dict(l=10, r=80, t=10, b=10),
+                    legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1, font=dict(size=11)),
+                    paper_bgcolor="#f9f9f9",
+                    plot_bgcolor="#f9f9f9"
+                )
+                st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     # ──── TAB: ACTIVIDADES ────
-    with tabs[0]:
+    with tabs[1]:
         if df_ca.empty:
             st.info("No hay datos de actividades.")
         else:
@@ -196,49 +256,58 @@ def render_dashboard(supabase: Client):
             else:
                 _sunburst_avance(df_ca)
 
-            st.markdown("### 🍩 Estado General del Proyecto")
-            col_g1, col_g2, col_g3 = st.columns(3)
-            with col_g1:
-                _donut_progress(pct_avance, "Avance Global")
-        with col_g2:
-            est_labels = ["Completadas", "En Progreso", "Sin Avance"]
-            est_values = [completadas, con_avance - completadas, sin_avance]
-            est_colors = ["#b6d7a8", "#f9e0a0", "#f4cccc"]
-            _pie_chart(est_labels, est_values, "Estado de Actividades", colors=est_colors)
-            with col_g3:
-                comp_avance = None
-                if "componente" in df_ca.columns:
-                    comp_avance = df_ca.groupby("componente").agg(
-                        pct_promedio=("pct_avance", "mean"),
-                        valor_total=("valor_total", "sum"),
-                        valor_ejecutado=("valor_ejecutado", "sum"),
-                        cantidad=("id", "count")
-                    ).reset_index()
-                    _pie_chart(
-                        comp_avance["componente"].tolist(),
-                        comp_avance["valor_ejecutado"].tolist(),
-                        "$ Ejecutado por Componente",
-                        colors=px.colors.qualitative.Bold[:len(comp_avance)]
-                    )
+            with st.expander("📊 Estado General", expanded=False):
+                st.markdown("### 🍩 Estado General del Proyecto")
+                col_g1, col_g2 = st.columns(2)
+                with col_g1:
+                    _donut_progress(pct_avance, "Avance Global")
+                with col_g2:
+                    est_labels = ["Completadas", "En Progreso", "Sin Avance"]
+                    est_values = [completadas, con_avance - completadas, sin_avance]
+                    est_colors = ["#b6d7a8", "#f9e0a0", "#f4cccc"]
+                    _pie_chart(est_labels, est_values, "Estado de Actividades", colors=est_colors)
+                col_g1, col_g2 = st.columns(2)
+                with col_g1:
+                    comp_avance = None
+                    if "componente" in df_ca.columns:
+                        comp_avance = df_ca.groupby("componente").agg(
+                            pct_promedio=("pct_avance", "mean"),
+                            valor_total=("valor_total", "sum"),
+                            valor_ejecutado=("valor_ejecutado", "sum"),
+                            cantidad=("id", "count")
+                        ).reset_index()
+                        _pie_chart(
+                            comp_avance["componente"].tolist(),
+                            comp_avance["valor_ejecutado"].tolist(),
+                            "$ Ejecutado por Componente",
+                            colors=px.colors.qualitative.Bold[:len(comp_avance)]
+                        )
 
-            if comp_avance is not None:
-                st.divider()
-                col_b1, col_b2 = st.columns(2)
-                with col_b1:
-                    st.markdown("**% Avance Promedio por Componente**")
-                    chart_data = comp_avance.set_index("componente")["pct_promedio"]
-                    chart_data.index = chart_data.index.str[:25]
-                    st.bar_chart(chart_data, height=350)
-                with col_b2:
-                    st.markdown("**$ Ejecutado vs $ Total por Componente**")
-                    comp_chart = comp_avance[["componente", "valor_total", "valor_ejecutado"]].copy()
-                    comp_chart["componente"] = comp_chart["componente"].str[:25]
-                    comp_chart = comp_chart.set_index("componente")
-                    comp_chart.columns = ["Total", "Ejecutado"]
-                    st.bar_chart(comp_chart, height=350)
+                if comp_avance is not None:
+                    st.divider()
+                    col_b1, col_b2 = st.columns(2)
+                    with col_b1:
+                        st.markdown("**% Avance Promedio por Componente**")
+                        chart_data = comp_avance.set_index("componente")["pct_promedio"]
+                        chart_data.index = chart_data.index.str[:25]
+                        st.bar_chart(chart_data, height=280)
+                    with col_b2:
+                        st.markdown("**$ Ejecutado vs $ Total por Componente**")
+                        comp_chart = comp_avance[["componente", "valor_total", "valor_ejecutado"]].copy()
+                        comp_chart["componente"] = comp_chart["componente"].str[:25]
+                        comp_chart = comp_chart.set_index("componente")
+                        comp_chart.columns = ["Total", "Ejecutado"]
+                        st.bar_chart(comp_chart, height=280)
 
     # ──── TAB: TAREAS ────
-    with tabs[1]:
+    with tabs[2]:
+        k1, k2 = st.columns(2)
+        k1.metric("Total Actividades", total_act)
+        k2.metric("Completadas", completadas)
+        k1, k2 = st.columns(2)
+        k1.metric("% Avance", f"{pct_avance}%")
+        st.divider()
+
         dtar = get_tareas(supabase, PA)
         if dtar.empty:
             st.info("No hay datos de tareas.")
@@ -259,36 +328,36 @@ def render_dashboard(supabase: Client):
                         pc = [pri_colors.get(l, "#9b59b6") for l in pri_labels]
                         _pie_chart(pri_labels, pri_values, "Tareas por Prioridad", colors=pc)
 
-                st.markdown("**Cambiar estado de tarea:**")
-                tar_options = dtar["id_tarea"] + " — " + dtar["descripcion"].str[:60] + " [" + dtar["estado"] + "]"
-                sel_tar = st.selectbox("Seleccionar tarea:", tar_options.tolist(), key="dash_tar_sel")
-                if sel_tar:
-                    sel_id = sel_tar.split(" — ")[0]
-                    tar_row = dtar[dtar["id_tarea"] == sel_id].iloc[0]
-                    col_te, col_tp, col_tn = st.columns(3)
-                    with col_te:
-                        nuevo_est = st.selectbox("Nuevo estado:", ["Pendiente", "En progreso", "Completada"],
-                            index=["Pendiente", "En progreso", "Completada"].index(tar_row["estado"]) if tar_row["estado"] in ["Pendiente", "En progreso", "Completada"] else 0,
-                            key="dash_tar_estado")
-                    with col_tp:
-                        nuevo_pri = st.selectbox("Prioridad:", ["Alta", "Media", "Baja"],
-                            index=["Alta", "Media", "Baja"].index(tar_row["prioridad"]) if "prioridad" in tar_row and tar_row["prioridad"] in ["Alta", "Media", "Baja"] else 1,
-                            key="dash_tar_pri")
-                    with col_tn:
-                        nueva_nota = st.text_input("Notas:", value=str(tar_row.get("notas", "") or ""), key="dash_tar_nota")
-                    if st.button("💾 Actualizar Tarea", type="primary", use_container_width=True, key="btn_update_tar_dash"):
-                        from database.queries import update_tarea_estado
-                        try:
-                            update_tarea_estado(supabase, sel_id, nuevo_est, nueva_nota)
-                            if nuevo_pri != tar_row.get("prioridad"):
-                                update_record(supabase, "tareas", "id_tarea", sel_id, {"prioridad": nuevo_pri})
-                            st.success(f"✅ Tarea {sel_id} actualizada a **{nuevo_est}**")
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"❌ Error: {e}")
+                with st.expander("✏️ Cambiar estado de tarea", expanded=False):
+                    st.markdown("**Cambiar estado de tarea:**")
+                    tar_options = dtar["id_tarea"] + " — " + dtar["descripcion"].str[:60] + " [" + dtar["estado"] + "]"
+                    sel_tar = st.selectbox("Seleccionar tarea:", tar_options.tolist(), key="dash_tar_sel")
+                    if sel_tar:
+                        sel_id = sel_tar.split(" — ")[0]
+                        tar_row = dtar[dtar["id_tarea"] == sel_id].iloc[0]
+                        col_te, col_tp = st.columns(2)
+                        with col_te:
+                            nuevo_est = st.selectbox("Nuevo estado:", ["Pendiente", "En progreso", "Completada"],
+                                index=["Pendiente", "En progreso", "Completada"].index(tar_row["estado"]) if tar_row["estado"] in ["Pendiente", "En progreso", "Completada"] else 0,
+                                key="dash_tar_estado")
+                            nueva_nota = st.text_input("Notas:", value=str(tar_row.get("notas", "") or ""), key="dash_tar_nota")
+                        with col_tp:
+                            nuevo_pri = st.selectbox("Prioridad:", ["Alta", "Media", "Baja"],
+                                index=["Alta", "Media", "Baja"].index(tar_row["prioridad"]) if "prioridad" in tar_row and tar_row["prioridad"] in ["Alta", "Media", "Baja"] else 1,
+                                key="dash_tar_pri")
+                        if st.button("💾 Actualizar Tarea", type="primary", use_container_width=True, key="btn_update_tar_dash"):
+                            from database.queries import update_tarea_estado
+                            try:
+                                update_tarea_estado(supabase, sel_id, nuevo_est, nueva_nota)
+                                if nuevo_pri != tar_row.get("prioridad"):
+                                    update_record(supabase, "tareas", "id_tarea", sel_id, {"prioridad": nuevo_pri})
+                                st.success(f"✅ Tarea {sel_id} actualizada a **{nuevo_est}**")
+                                st.rerun()
+                            except Exception as e:
+                                st.error(f"❌ Error: {e}")
 
     # ──── TAB: INVENTARIO ────
-    with tabs[2]:
+    with tabs[3]:
         response_inv = supabase.table("control_inventario").select("*").eq("proyecto", PA).execute()
         if not response_inv.data:
             st.info("No hay datos de inventario")
@@ -314,11 +383,11 @@ def render_dashboard(supabase: Client):
                 fig = go.Figure(go.Funnel(y=["Entradas", "Salidas"], x=[ent, sal], textinfo='value+percent total',
                     textfont=dict(size=16, color="#000000"),
                     marker=dict(color=marker_colors)))
-                fig.update_layout(title=dict(text="Volumen Entradas vs Salidas", font=dict(size=20, color="#000000"), x=0.5), margin=dict(t=50, b=20, l=20, r=20), height=420, paper_bgcolor='#f9f9f9')
+                fig.update_layout(title=dict(text="Volumen Entradas vs Salidas", font=dict(size=20, color="#000000"), x=0.5), margin=dict(t=50, b=20, l=20, r=20), height=350, paper_bgcolor='#f9f9f9')
                 st.plotly_chart(fig, use_container_width=True)
 
     # ──── TAB: ASISTENCIA ────
-    with tabs[3]:
+    with tabs[4]:
         from datetime import date as dt_mod
         dfa = get_asistencia(supabase, PA, dt_mod.today())
         if dfa.empty or "estado" not in dfa.columns:
@@ -334,10 +403,10 @@ def render_dashboard(supabase: Client):
             with col_a2:
                 if "cargo" in dfa.columns:
                     cargo_counts = dfa.groupby("cargo")["estado"].value_counts().unstack(fill_value=0)
-                    st.bar_chart(cargo_counts, height=350)
+                    st.bar_chart(cargo_counts, height=280)
 
     # ──── TAB: NOMINA ────
-    with tabs[4]:
+    with tabs[5]:
         if not es_dir:
             st.warning("⚠️ Solo el Director puede ver la nómina.")
         else:
@@ -350,11 +419,12 @@ def render_dashboard(supabase: Client):
                     ing = dfn[dfn["tipo"].isin(["Mensual", "Quincenal", "Jornal diario", "Bonificacion"])]["valor"].sum()
                     pre = dfn[dfn["tipo"].isin(["Prestamo", "Anticipo"])]["valor"].sum()
                     ded = dfn[dfn["tipo"] == "Deduccion"]["valor"].sum() if "Deduccion" in dfn["tipo"].values else 0
-                    n1, n2, n3, n4 = st.columns(4)
-                    n1.metric("Total Pagos", fmt_cop(ing))
+                    n1, n2 = st.columns(2)
+                    n1.metric("Pago Bruto", fmt_cop(ing))
                     n2.metric("Préstamos", fmt_cop(pre))
-                    n3.metric("Deducciones", fmt_cop(ded))
-                    n4.metric("Neto", fmt_cop(ing - pre - ded))
+                    n1, n2 = st.columns(2)
+                    n1.metric("Deducciones", fmt_cop(ded))
+                    n2.metric("Neto", fmt_cop(ing - pre - ded))
                 with col_n2:
                     nom_labels = dfn.groupby("tipo")["valor"].sum().sort_values(ascending=False).index.tolist()
                     nom_values = dfn.groupby("tipo")["valor"].sum().sort_values(ascending=False).values.tolist()
@@ -364,74 +434,3 @@ def render_dashboard(supabase: Client):
                     _pie_chart(nom_labels, nom_values, "Distribución de Nómina", colors=nc)
 
     st.divider()
-
-    # ═══ REGISTRAR AVANCE POR DESPLEGABLES ═══
-
-    df_act_list = df_ca.copy() if not df_ca.empty else pd.DataFrame()
-    if not df_act_list.empty:
-        with st.expander("Registrar Avance", expanded=False):
-            act_options = (df_act_list["id"] + " — " + df_act_list["descripcion"].str[:50] + " (" + df_act_list["pct_avance"].astype(str) + "%)").tolist()
-            col_av1, col_av2, col_av3 = st.columns([3, 1, 1])
-        with col_av1:
-            sel_actividad = st.selectbox("Actividad:", act_options, key="dash_av_actividad")
-        with col_av2:
-            cant_avance = st.number_input("Cantidad ejecutada:", min_value=0.0, step=1.0, key="dash_av_cant")
-        with col_av3:
-            st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("💾 Guardar Avance", type="primary", use_container_width=True, key="btn_save_avance_dropdown"):
-                if sel_actividad and cant_avance > 0:
-                    sel_id = sel_actividad.split(" — ")[0]
-                    data = {
-                        "proyecto": PA,
-                        "fecha": datetime.date.today().isoformat(),
-                        "id_item": sel_id,
-                        "cantidad": cant_avance,
-                        "usuario": st.session_state.usuario_actual
-                    }
-                    try:
-                        insert_avance(supabase, data)
-                        st.success(f"✅ Avance registrado: {cant_avance} a actividad {sel_id}")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ Error: {e}")
-                else:
-                    st.warning("⚠️ Seleccione una actividad e ingrese una cantidad > 0")
-
-    # ═══ TABLA RESUMEN ═══
-    with st.expander("Tabla de Actividades", expanded=False):
-        col_f1, col_f2, col_f3 = st.columns(3)
-        with col_f1:
-            componentes = df_ca["componente"].unique().tolist() if "componente" in df_ca.columns else []
-            filtro_comp = st.multiselect("Componente:", componentes, key="dash_fcomp")
-        with col_f2:
-            capitulos = df_ca["capitulo"].unique().tolist() if "capitulo" in df_ca.columns else []
-            filtro_cap = st.multiselect("Capítulo:", capitulos, key="dash_fcap")
-        with col_f3:
-            buscar = st.text_input("Buscar actividad:", key="dash_buscar")
-
-        df_filt = df_ca.copy()
-        if filtro_comp and "componente" in df_filt.columns:
-            df_filt = df_filt[df_filt["componente"].isin(filtro_comp)]
-        if filtro_cap and "capitulo" in df_filt.columns:
-            df_filt = df_filt[df_filt["capitulo"].isin(filtro_cap)]
-        if buscar and "descripcion" in df_filt.columns:
-            df_filt = df_filt[df_filt["descripcion"].str.contains(buscar, case=False, na=False)]
-
-        if df_filt.empty:
-            st.info("No hay actividades con los filtros seleccionados")
-        else:
-            display_cols = [c for c in ["id", "capitulo", "componente", "descripcion", "unidad", "cantidad_total", "cantidad_ejecutada", "pct_avance", "valor_total", "valor_ejecutado"] if c in df_filt.columns]
-            tbl_config = {
-                "id": st.column_config.TextColumn("ID", disabled=True, width="small"),
-                "capitulo": st.column_config.TextColumn("Capítulo", disabled=True, width="small"),
-                "componente": st.column_config.TextColumn("Componente", disabled=True, width="medium"),
-                "descripcion": st.column_config.TextColumn("Descripción", disabled=True, width="large"),
-                "unidad": st.column_config.TextColumn("Unidad", disabled=True, width="small"),
-                "cantidad_total": st.column_config.NumberColumn("Cant. Total", disabled=True, format="%.2f", width="small"),
-                "cantidad_ejecutada": st.column_config.NumberColumn("Cant. Ejec.", disabled=True, format="%.2f", width="small"),
-                "pct_avance": st.column_config.NumberColumn("% Avance", disabled=True, format="%.1f %%", width="small"),
-                "valor_total": st.column_config.NumberColumn("Valor Total", disabled=True, format="$ %,.0f", width="medium"),
-                "valor_ejecutado": st.column_config.NumberColumn("Valor Ejec.", disabled=True, format="$ %,.0f", width="medium"),
-            }
-            config_f = {k: v for k, v in tbl_config.items() if k in display_cols}
-            st.dataframe(df_filt[display_cols], column_config=config_f, use_container_width=True, hide_index=True, key="df_actividades_dash")

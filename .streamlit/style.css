@@ -40,6 +40,7 @@ h1 {
     letter-spacing: 0.5px;
     box-shadow: 0 4px 6px rgba(201, 162, 39, 0.3) !important;
     transition: all 0.3s ease !important;
+    min-height: 44px !important;
 }
 
 .stButton > button[kind="primary"]:hover {
@@ -56,6 +57,7 @@ h1 {
     border-radius: 8px !important;
     font-weight: 500 !important;
     transition: all 0.3s ease !important;
+    min-height: 44px !important;
 }
 
 .stButton > button:not([kind="primary"]):hover {
@@ -96,6 +98,7 @@ h1 {
     border: 2px solid #E0E0E0 !important;
     border-radius: 8px !important;
     transition: all 0.3s ease;
+    min-height: 44px !important;
 }
 
 .stTextInput > div > div > input:focus,
@@ -179,4 +182,163 @@ hr {
 .stDateInput > div > div > input {
     border: 2px solid #E0E0E0 !important;
     border-radius: 8px !important;
+}
+
+/* ============================================================
+   COMPACT CARDS / EXPANDERS
+   ============================================================ */
+
+.streamlit-expanderHeader {
+    font-size: 13px !important;
+    padding: 6px 12px !important;
+}
+
+.streamlit-expanderHeader p,
+.streamlit-expanderHeader span {
+    font-size: 13px !important;
+}
+
+.streamlit-expanderDetails {
+    padding-top: 4px !important;
+}
+
+.streamlit-expanderDetails .stMarkdown {
+    font-size: 13px !important;
+}
+
+.streamlit-expanderDetails label {
+    font-size: 12px !important;
+}
+
+.streamlit-expanderDetails .stMetricValue {
+    font-size: 1.1rem !important;
+}
+
+.streamlit-expanderDetails .stMetricLabel {
+    font-size: 11px !important;
+}
+
+.streamlit-expanderDetails .stCaption {
+    font-size: 11px !important;
+}
+
+.streamlit-expanderDetails .stTextInput input,
+.streamlit-expanderDetails .stTextArea textarea,
+.streamlit-expanderDetails .stSelectbox div {
+    font-size: 13px !important;
+}
+
+.streamlit-expanderDetails .stButton button {
+    font-size: 12px !important;
+    padding: 4px 10px !important;
+    min-height: 36px !important;
+}
+
+/* ============================================================
+   MOBILE-FIRST RESPONSIVE
+   ============================================================ */
+
+/* Target: pantallas menores a 768px (celulares) */
+@media (max-width: 768px) {
+
+    /* Apilar columnas verticalmente en mobile */
+    [data-testid="column"] {
+        flex-direction: column !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Hacer que los grupos de columnas se comporten como bloques */
+    [data-testid="stHorizontalBlock"] {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    /* Sidebar cerrada por defecto en mobile */
+    [data-testid="stSidebar"] {
+        width: 280px !important;
+    }
+
+    /* Reducir padding general */
+    .stApp > header {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .block-container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        padding-top: 2rem !important;
+        max-width: 100% !important;
+    }
+
+    /* Headers mas compactos en mobile */
+    h1 { font-size: 1.4rem !important; }
+    h2 { font-size: 1.2rem !important; }
+    h3 { font-size: 1.05rem !important; }
+
+    /* Botones mas grandes para toque */
+    .stButton > button {
+        min-height: 48px !important;
+        font-size: 14px !important;
+        padding: 10px 16px !important;
+    }
+
+    /* Metricas en mobile */
+    [data-testid="stMetricValue"] {
+        font-size: 1.5rem !important;
+    }
+
+    /* Tablas con scroll horizontal */
+    .stDataFrame {
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
+
+    /* Reducir altura de graficos */
+    .js-plotly-plot {
+        max-height: 350px !important;
+    }
+
+    /* Tabs mas compactos */
+    [data-testid="stTabNav"] button {
+        padding: 8px 10px !important;
+        font-size: 12px !important;
+    }
+
+    /* Form inputs mas grandes */
+    .stTextInput input,
+    .stTextArea textarea,
+    .stSelectbox div[role="combobox"] {
+        font-size: 16px !important;
+        min-height: 48px !important;
+    }
+
+    /* Chat input */
+    [data-testid="stChatInput"] textarea {
+        font-size: 16px !important;
+    }
+
+    /* Nav cards en mobile */
+    .nav-card {
+        padding: 16px 12px !important;
+    }
+    .nav-icon {
+        font-size: 28px !important;
+    }
+    .nav-title {
+        font-size: 14px !important;
+    }
+}
+
+/* Target: pantallas medianas (tablets) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    [data-testid="column"] {
+        min-width: 0 !important;
+    }
+
+    .block-container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
 }
