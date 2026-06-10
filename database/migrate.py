@@ -10,18 +10,20 @@ PROYECTOS = ["Edificio Colombo Americana", "Torres del Parque", "Centro Comercia
 def _d(offset=0): return (today - timedelta(days=offset)).isoformat()
 
 def get_conn():
-    try:
-        import streamlit as st
-        url = st.secrets["database"]["DATABASE_URL"]
-    except Exception:
+    url = os.environ.get("DATABASE_URL", "")
+    if not url:
         try:
-            import tomllib
-            path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".streamlit", "secrets.toml")
-            with open(path, "rb") as f:
-                cfg = tomllib.load(f)
-            url = cfg["database"]["DATABASE_URL"]
+            import streamlit as st
+            url = st.secrets["database"]["DATABASE_URL"]
         except Exception:
-            url = input("DATABASE_URL: ").strip()
+            try:
+                import tomllib
+                path = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".streamlit", "secrets.toml")
+                with open(path, "rb") as f:
+                    cfg = tomllib.load(f)
+                url = cfg["database"]["DATABASE_URL"]
+            except Exception:
+                url = input("DATABASE_URL: ").strip()
     return psycopg2.connect(url)
 
 def run_schema(cur):

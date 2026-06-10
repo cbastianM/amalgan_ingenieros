@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import psycopg2
 import psycopg2.extras
@@ -155,16 +156,9 @@ def _get_connection(database_url: str):
 class PgClient:
     def __init__(self, connection_string: Optional[str] = None):
         if connection_string is None:
-            try:
-                connection_string = st.secrets["database"]["DATABASE_URL"]
-            except Exception:
-                import os
-                connection_string = os.environ.get("DATABASE_URL", "")
-                if not connection_string:
-                    raise RuntimeError(
-                        "DATABASE_URL no encontrada. En Render: Settings -> Environment -> agregar DATABASE_URL. "
-                        "En local: .streamlit/secrets.toml con [database] DATABASE_URL = \"...\""
-                    )
+            connection_string = os.environ.get("DATABASE_URL", "")
+            if not connection_string:
+                raise RuntimeError("DATABASE_URL no configurada. En Render: Settings > Environment > DATABASE_URL")
         self._connection_string = connection_string
 
     def table(self, name: str) -> QueryBuilder:

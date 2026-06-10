@@ -150,14 +150,8 @@ def _build_contexto(supabase, proyecto) -> str:
 
 
 def _call_deepseek(messages: list) -> str:
-    api_key = ""
-    try:
-        api_key = st.secrets.get("deepseek", {}).get("API_KEY", "")
-    except Exception:
-        pass
-    if not api_key:
-        import os
-        api_key = os.environ.get("DEEPSEEK_API_KEY", "")
+    import os
+    api_key = os.environ.get("DEEPSEEK_API_KEY", "")
     if not api_key:
         return "⚠️ DEEPSEEK_API_KEY no encontrada. Agregala como variable de entorno en Render (Settings > Environment)."
     if not api_key.startswith("sk-"):
