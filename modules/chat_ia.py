@@ -150,7 +150,11 @@ def _build_contexto(supabase, proyecto) -> str:
 
 
 def _call_deepseek(messages: list) -> str:
-    api_key = st.secrets.get("deepseek", {}).get("API_KEY", "")
+    api_key = ""
+    try:
+        api_key = st.secrets.get("deepseek", {}).get("API_KEY", "")
+    except Exception:
+        pass
     if not api_key:
         import os
         api_key = os.environ.get("DEEPSEEK_API_KEY", "")

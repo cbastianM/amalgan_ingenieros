@@ -26,7 +26,11 @@ def get_email_sender_config() -> dict:
     if cfg and cfg.get("sender_email") and cfg.get("sender_password"):
         return cfg
     try:
-        secrets = st.secrets.get("email", {})
+        secrets = {}
+        try:
+            secrets = st.secrets.get("email", {})
+        except Exception:
+            pass
         if secrets.get("SENDER_EMAIL") and secrets.get("SENDER_PASSWORD"):
             smtp = get_smtp_for_email(secrets["SENDER_EMAIL"])
             return {
